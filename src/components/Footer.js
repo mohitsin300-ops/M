@@ -53,7 +53,7 @@ export default function Footer() {
                     <div className="footer-contact">
                         <h3>Reach Us</h3>
                         <p><strong>Email:</strong> mjtechglobal@zohomail.in</p>
-                        <p><strong>Alt Email:</strong> mjtechglobal@gmail.com</p>
+                        <p><strong>Alt Email:</strong> mjtechbharat@gmail.com</p>
                         <div className="footer-socials">
                             {/* Social icons placeholders */}
                             <div className="social-icon">Li</div>

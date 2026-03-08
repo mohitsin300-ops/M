@@ -33,6 +33,8 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    margin-right: 2rem;
+    /* Add margin so it doesn't touch nav links */
 }
 
 .logo-mj {
@@ -43,7 +45,8 @@
 .desktop-menu {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 2rem;
+    /* Spread out the navigation links a bit more */
 }
 
 .nav-link {
