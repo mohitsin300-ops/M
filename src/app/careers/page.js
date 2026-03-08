@@ -5,10 +5,11 @@ import Link from 'next/link';
 
 export default function Careers() {
     const jobs = [
-        { title: "Senior React Developer", type: "Full-Time", location: "Remote / India", exp: "5+ Years" },
-        { title: "UI/UX Designer", type: "Full-Time", location: "Remote", exp: "3+ Years" },
-        { title: "Next.js Full Stack Engineer", type: "Contract", location: "Global", exp: "4+ Years" },
-        { title: "AI/ML Engineer", type: "Full-Time", location: "Remote / India", exp: "2+ Years" }
+        { title: "Senior React Developer", type: "Contract Base", location: "Remote / India", exp: "1-3 Years" },
+        { title: "UI/UX Designer", type: "Contract Base", location: "Remote", exp: "1-3 Years" },
+        { title: "Next.js Full Stack Engineer", type: "Contract Base", location: "Global", exp: "1-3 Years" },
+        { title: "AI/ML Engineer", type: "Contract Base", location: "Remote / India", exp: "1-3 Years" },
+        { title: "Digital Marketing Executive", type: "Full-Time", location: "Remote / India", exp: "Fresher to 1 Year" }
     ];
 
     return (
