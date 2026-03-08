@@ -10,6 +10,8 @@ export default function sitemap() {
         '/internship',
         '/blog',
         '/contact',
+        '/auth',
+        '/verify',
         '/privacy-policy',
         '/terms'
     ].map((route) => ({
