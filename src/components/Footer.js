@@ -21,7 +21,7 @@ export default function Footer() {
                                 <div className="msme-info">
                                     <p className="msme-title">Government Registered</p>
                                     <p className="msme-text">MSME Certified Company</p>
-                                    <p className="msme-urn">udyam-up-13-0023373</p>
+                                    <p className="msme-urn">UDYAM-UP-13-0023373</p>
                                 </div>
                             </div>
 
