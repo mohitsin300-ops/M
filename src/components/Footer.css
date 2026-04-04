@@ -160,6 +160,16 @@
     font-size: 0.95rem;
 }
 
+.msme-urn {
+    margin: 2px 0 0;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.3px;
+    line-height: 1.35;
+    word-break: break-word;
+    max-width: 220px;
+}
+
 .founder-avatar {
     width: 40px;
     height: 40px;
