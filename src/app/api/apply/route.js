@@ -1,3 +1,4 @@
+
 import { NextResponse } from 'next/server';
 import { adminDb, adminInitError, adminReady } from '../../../lib/firebaseAdmin';
 
@@ -49,3 +50,6 @@ export async function POST(request) {
         );
     }
 }
+
+
+
