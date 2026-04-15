@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
+import { auth, db } from '../../lib/firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { LogOut, FileText, Download, User as UserIcon, Calendar, Clock, Award, Mail, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,37 +20,32 @@ export default function Dashboard() {
     useEffect(() => {
         let isMounted = true;
 
-        const fetchUserAndData = async () => {
+        const fetchUserAndData = async (currentUser) => {
             try {
-                // 1. Get logged-in user
-                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-                if (sessionError || !session) {
+                if (!currentUser) {
                     if (isMounted) router.push('/auth?mode=login');
                     return;
                 }
 
-                if (isMounted) setUser(session.user);
+                if (isMounted) setUser(currentUser);
 
-                // 2. Fetch Applications
-                const { data: apps, error: appError } = await supabase
-                    .from('applications')
-                    .select('*')
-                    .eq('email', session.user.email)
-                    .order('created_at', { ascending: false });
+                const appsQuery = query(collection(db, 'applications'), where('email', '==', currentUser.email));
+                const certQuery = query(collection(db, 'certificates'), where('user_email', '==', currentUser.email));
 
-                if (!appError && isMounted) {
-                    setApplications(apps || []);
-                }
+                const [appsSnapshot, certSnapshot] = await Promise.all([
+                    getDocs(appsQuery),
+                    getDocs(certQuery)
+                ]);
 
-                // 3. Fetch certificates assigned to this user's email
-                const { data: certs, error: certError } = await supabase
-                    .from('certificates')
-                    .select('*')
-                    .eq('user_email', session.user.email);
+                const apps = appsSnapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
+                const certs = certSnapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
 
-                if (!certError && isMounted) {
-                    setCertificates(certs || []);
+                apps.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+                certs.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+
+                if (isMounted) {
+                    setApplications(apps);
+                    setCertificates(certs);
                 }
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
@@ -57,15 +54,18 @@ export default function Dashboard() {
             }
         };
 
-        fetchUserAndData();
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            fetchUserAndData(currentUser);
+        });
 
         return () => {
             isMounted = false;
+            unsubscribe();
         };
     }, [router]);
 
     const handleLogout = async () => {
-        await supabase.auth.signOut();
+        await signOut(auth);
         router.push('/');
     };
 
@@ -87,11 +87,11 @@ export default function Dashboard() {
                 <header className="dashboard-header">
                     <div className="dashboard-user-info">
                         <div className="dashboard-avatar">
-                            {user.user_metadata?.full_name?.charAt(0) || user.email.charAt(0).toUpperCase()}
+                            {user.displayName?.charAt(0) || user.email?.charAt(0).toUpperCase()}
                         </div>
                         <div>
                             <h1 className="dashboard-greeting">
-                                Welcome back, {user.user_metadata?.full_name || 'User'}
+                                Welcome back, {user.displayName || 'User'}
                             </h1>
                             <p className="dashboard-email">
                                 <Mail size={14} /> {user.email}
@@ -116,15 +116,15 @@ export default function Dashboard() {
                             <div>
                                 <div className="profile-info-group">
                                     <p className="profile-label">Full Name</p>
-                                    <p className="profile-value">{user.user_metadata?.full_name || 'Not provided'}</p>
+                                    <p className="profile-value">{user.displayName || 'Not provided'}</p>
                                 </div>
                                 <div className="profile-info-group">
                                     <p className="profile-label">WhatsApp</p>
-                                    <p className="profile-value">{user.user_metadata?.whatsapp_number || 'Not provided'}</p>
+                                    <p className="profile-value">{user.phoneNumber || 'Not provided'}</p>
                                 </div>
                                 <div className="profile-info-group">
                                     <p className="profile-label">Account ID</p>
-                                    <p className="profile-value-mono">{user.id.substring(0, 13)}...</p>
+                                    <p className="profile-value-mono">{user.uid.substring(0, 13)}...</p>
                                 </div>
                             </div>
                         </div>
