@@ -1,40 +1,38 @@
 "use client";
-import { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
-import { useRouter } from 'next/navigation';
+import { Suspense, useState, useEffect } from 'react';
+import { auth } from '../../lib/firebase';
+import { confirmPasswordReset, verifyPasswordResetCode } from 'firebase/auth';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function ResetPassword() {
+function ResetPasswordContent() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ text: '', type: '' });
     const [isSessionActive, setIsSessionActive] = useState(false);
+    const [oobCode, setOobCode] = useState('');
 
     useEffect(() => {
-        // Supabase will automatically handle the #access_token in the URL.
-        // We just verify that a session was established.
-        const checkSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
+        const code = searchParams.get('oobCode');
+        if (!code) {
+            setMessage({ text: 'Invalid or expired reset link.', type: 'error' });
+            return;
+        }
+
+        setOobCode(code);
+        const validateCode = async () => {
+            try {
+                await verifyPasswordResetCode(auth, code);
                 setIsSessionActive(true);
+            } catch {
+                setMessage({ text: 'Invalid or expired reset link.', type: 'error' });
             }
         };
-        checkSession();
 
-        // Optional listener in case it takes a moment to persist
-        const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-            if (event === 'PASSWORD_RECOVERY') {
-                setIsSessionActive(true);
-            }
-        });
-
-        return () => {
-            if (authListener?.subscription) {
-                authListener.subscription.unsubscribe();
-            }
-        };
-    }, []);
+        validateCode();
+    }, [searchParams]);
 
     const handleUpdate = async (e) => {
         e.preventDefault();
@@ -48,21 +46,14 @@ export default function ResetPassword() {
         setMessage({ text: '', type: '' });
 
         try {
-            const { data, error } = await supabase.auth.updateUser({
-                password: password
+            await confirmPasswordReset(auth, oobCode, password);
+            setMessage({
+                text: 'Password successfully updated!',
+                type: 'success'
             });
-
-            if (error) {
-                setMessage({ text: error.message, type: 'error' });
-            } else {
-                setMessage({
-                    text: 'Password successfully updated!',
-                    type: 'success'
-                });
-                setTimeout(() => router.push('/dashboard'), 2000);
-            }
+            setTimeout(() => router.push('/auth?mode=login'), 1500);
         } catch (error) {
-            setMessage({ text: 'An unexpected error occurred.', type: 'error' });
+            setMessage({ text: error.message || 'An unexpected error occurred.', type: 'error' });
         } finally {
             setLoading(false);
         }
@@ -122,5 +113,13 @@ export default function ResetPassword() {
                 </form>
             </div>
         </div>
+    );
+}
+
+export default function ResetPassword() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center p-4 pt-32 text-white">Loading...</div>}>
+            <ResetPasswordContent />
+        </Suspense>
     );
 }
