@@ -6,6 +6,8 @@ import { useState, useRef } from 'react';
 export default function Internship() {
     const [status, setStatus] = useState('');
     const [duration, setDuration] = useState('');
+    const [selectedDomain, setSelectedDomain] = useState('');
+    const [customDomain, setCustomDomain] = useState('');
     const fileInputRef = useRef(null);
 
     const fadeInUp = {
@@ -28,6 +30,13 @@ export default function Internship() {
         setStatus('Submitting...');
 
         const formData = new FormData(e.target);
+        const finalDomain = selectedDomain === 'custom' ? customDomain.trim() : formData.get('skills');
+
+        if (!finalDomain) {
+            setStatus('Please enter your custom course/domain.');
+            return;
+        }
+
         const data = {
             name: formData.get('name'),
             father_name: formData.get('father_name'),
@@ -35,7 +44,7 @@ export default function Internship() {
             phone: formData.get('phone'),
             college: formData.get('college'),
             gender: formData.get('gender'),
-            skills: formData.get('skills'),
+            skills: finalDomain,
             duration: formData.get('duration'),
         };
 
@@ -50,9 +59,21 @@ export default function Internship() {
             if (res.ok) {
                 setStatus('Application submitted successfully! We will contact you soon.');
                 e.target.reset();
+                setSelectedDomain('');
+                setCustomDomain('');
                 if (fileInputRef.current) fileInputRef.current.value = '';
             } else {
-                setStatus('Failed to submit application. Please try again.');
+                let errorMessage = 'Failed to submit application. Please try again.';
+                try {
+                    const payload = await res.json();
+                    if (payload?.message) {
+                        errorMessage = payload.message;
+                    }
+                } catch {
+                    // Keep fallback error message when response is not JSON.
+                }
+
+                setStatus(errorMessage);
             }
         } catch (error) {
             console.error(error);
@@ -134,7 +155,13 @@ export default function Internship() {
 
                             <div style={{ marginBottom: '1.5rem' }}>
                                 <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Technology / Domain *</label>
-                                <select name="skills" required defaultValue="" style={{ width: '100%', padding: '1rem', background: 'var(--primary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'white', fontSize: '1rem', appearance: 'auto' }}>
+                                <select
+                                    name="skills"
+                                    required
+                                    value={selectedDomain}
+                                    onChange={(e) => setSelectedDomain(e.target.value)}
+                                    style={{ width: '100%', padding: '1rem', background: 'var(--primary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'white', fontSize: '1rem', appearance: 'auto' }}
+                                >
                                     <option value="" disabled>Select Domain</option>
                                     <option value="Frontend Developer">Frontend Developer</option>
                                     <option value="Backend Developer">Backend Developer</option>
@@ -148,6 +175,8 @@ export default function Internship() {
                                     <option value="C++/C Programming">C++/C Programming</option>
                                     <option value="Data Science">Data Science</option>
                                     <option value="Machine Learning">Machine Learning</option>
+      
+      
                                     <option value="Artificial Intelligence">Artificial Intelligence</option>
                                     <option value="Business Analytics">Business Analytics</option>
                                     <option value="Full Stack Web Development">Full Stack Web Development</option>
@@ -155,7 +184,19 @@ export default function Internship() {
                                     <option value="Digital Marketing">Digital Marketing</option>
                                     <option value="Cloud Computing">Cloud Computing</option>
                                     <option value="Unity Game Developer">Unity Game Developer</option>
+                                    <option value="custom">Custom Course (Type Manually)</option>
                                 </select>
+                                {selectedDomain === 'custom' && (
+                                    <input
+                                        type="text"
+                                        name="custom_skills"
+                                        required
+                                        value={customDomain}
+                                        onChange={(e) => setCustomDomain(e.target.value)}
+                                        placeholder="Type your course/domain"
+                                        style={{ width: '100%', marginTop: '0.75rem', padding: '1rem', background: 'var(--primary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'white', fontSize: '1rem' }}
+                                    />
+                                )}
                             </div>
                         </div>
 
