@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { supabase } from '../../lib/supabase';
+import { db } from '../../lib/firebase';
+import { collection, getDocs, limit, query, where } from 'firebase/firestore';
 import { Search, Award, CheckCircle, XCircle, Calendar, Clock, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './Verify.css';
@@ -30,16 +31,17 @@ function VerifyCertificate() {
         setResult(null);
 
         try {
-            // Query Supabase for the certificate number
-            const { data, error } = await supabase
-                .from('certificates')
-                .select('*')
-                .eq('certificate_no', idToVerify.trim())
-                .single();
+            const certQuery = query(
+                collection(db, 'certificates'),
+                where('certificate_no', '==', idToVerify.trim()),
+                limit(1)
+            );
+            const snapshot = await getDocs(certQuery);
 
-            if (error || !data) {
+            if (snapshot.empty) {
                 setResult('not_found');
             } else {
+                const data = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
                 setResult({ status: 'found', data });
             }
         } catch (error) {
