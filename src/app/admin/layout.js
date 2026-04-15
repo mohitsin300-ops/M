@@ -1,11 +1,9 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '../../lib/supabase';
+import { auth } from '../../lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 import './Admin.css';
-
-// Replace with actual admin emails if needed
-const ADMIN_EMAILS = ['mjtechglobal@zohomail.in', 'mjtechbharat@gmail.com']; // added the third in case
 
 export default function AdminLayout({ children }) {
     const router = useRouter();
@@ -13,30 +11,29 @@ export default function AdminLayout({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const checkAuth = async () => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                router.replace('/auth?mode=login');
+                setLoading(false);
+                return;
+            }
+
             try {
-                const { data: { session }, error } = await supabase.auth.getSession();
-
-                if (error || !session) {
-                    router.replace('/auth?mode=login');
-                    return;
-                }
-
-                const userEmail = session.user.email;
-                if (ADMIN_EMAILS.includes(userEmail)) {
+                const tokenResult = await user.getIdTokenResult(true);
+                if (tokenResult?.claims?.admin === true) {
                     setIsAuthorized(true);
                 } else {
-                    router.replace('/'); // Not authorized
+                    router.replace('/');
                 }
-            } catch (err) {
-                console.error("Auth error:", err);
+            } catch (error) {
+                console.error('Failed to verify admin role:', error);
                 router.replace('/');
-            } finally {
-                setLoading(false);
             }
-        };
 
-        checkAuth();
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
     }, [router]);
 
     if (loading) {
