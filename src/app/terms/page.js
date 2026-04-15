@@ -21,16 +21,61 @@ export default function TermsConditions() {
                     <p style={{ marginBottom: '1.5rem' }}>Last Updated: {new Date().toLocaleDateString()}</p>
 
                     <h2 style={{ color: 'var(--text-main)', fontSize: '1.5rem', margin: '2rem 0 1rem' }}>1. Acceptance of Terms</h2>
-                    <p>By accessing and using the MJ Tech Global website, you accept and agree to be bound by the terms and provision of this agreement. In addition, when using these particular services, you shall be subject to any posted guidelines or rules applicable to such services.</p>
+                    <p>
+                        By using MJ Tech Global website, apps, and digital services, you agree to these Terms.
+                        Additional app-specific terms may be shown at checkout, in app settings, or within plan details.
+                    </p>
 
-                    <h2 style={{ color: 'var(--text-main)', fontSize: '1.5rem', margin: '2rem 0 1rem' }}>2. Intellectual Property Rights</h2>
-                    <p>All content published and made available on our site is the property of MJ Tech Global and the site's creators. This includes, but is not limited to images, text, logos, documents, downloadable files and anything that contributes to the composition of our site.</p>
+                    <h2 style={{ color: 'var(--text-main)', fontSize: '1.5rem', margin: '2rem 0 1rem' }}>2. Services and Digital Content</h2>
+                    <p>
+                        We provide software development services, digital products, educational/technical content,
+                        and subscription features. Access to paid features depends on successful payment and compliance checks.
+                    </p>
 
-                    <h2 style={{ color: 'var(--text-main)', fontSize: '1.5rem', margin: '2rem 0 1rem' }}>3. Limitation of Liability</h2>
-                    <p>MJ Tech Global and our directors, officers, agents, employees, subsidiaries, and affiliates will not be liable for any actions, claims, losses, damages, liabilities and expenses including legal fees from your use of the site.</p>
+                    <h2 style={{ color: 'var(--text-main)', fontSize: '1.5rem', margin: '2rem 0 1rem' }}>3. Subscription, Auto-Pay, and Mandate Consent</h2>
+                    <p>
+                        For eligible plans, subscription may renew automatically at the chosen billing frequency.
+                        By enabling auto-pay, you authorize recurring debit as per the amount, cycle, and terms displayed at checkout.
+                        You are responsible for ensuring sufficient balance and valid payment instruments.
+                    </p>
 
-                    <h2 style={{ color: 'var(--text-main)', fontSize: '1.5rem', margin: '2rem 0 1rem' }}>4. Changes to Terms</h2>
-                    <p>We reserve the right to modify these terms from time to time at our sole discretion. Therefore, you should review these pages periodically.</p>
+                    <h2 style={{ color: 'var(--text-main)', fontSize: '1.5rem', margin: '2rem 0 1rem' }}>4. Cancellation and Renewal Control</h2>
+                    <p>
+                        You can request cancellation of future renewals before the next billing date.
+                        Cancellation stops upcoming cycles and does not automatically reverse already processed charges,
+                        except where required by law or explicitly stated in an app-specific refund policy.
+                    </p>
+
+                    <h2 style={{ color: 'var(--text-main)', fontSize: '1.5rem', margin: '2rem 0 1rem' }}>5. Pricing, Taxes, and Payment Failure</h2>
+                    <p>
+                        All prices are shown in applicable currency and may include/exclude taxes as stated at checkout.
+                        Failed, reversed, or disputed payments may result in suspension of premium access.
+                    </p>
+
+                    <h2 style={{ color: 'var(--text-main)', fontSize: '1.5rem', margin: '2rem 0 1rem' }}>6. Intellectual Property Rights</h2>
+                    <p>
+                        All content, software, branding, and digital assets on our platforms are owned by MJ Tech Global
+                        or licensed to us. Unauthorized copying, resale, scraping, or redistribution is prohibited.
+                    </p>
+
+                    <h2 style={{ color: 'var(--text-main)', fontSize: '1.5rem', margin: '2rem 0 1rem' }}>7. Limitation of Liability</h2>
+                    <p>
+                        To the maximum extent permitted by law, MJ Tech Global is not liable for indirect,
+                        incidental, special, or consequential losses arising from service use, payment delays,
+                        third-party gateway downtime, or user-side misconfiguration.
+                    </p>
+
+                    <h2 style={{ color: 'var(--text-main)', fontSize: '1.5rem', margin: '2rem 0 1rem' }}>8. App-Specific Legal Documents</h2>
+                    <p>
+                        Privacy policy, terms, and refund conditions may differ by app/plan.
+                        Where app-specific documents are published, those conditions apply to that app in addition to these general Terms.
+                    </p>
+
+                    <h2 style={{ color: 'var(--text-main)', fontSize: '1.5rem', margin: '2rem 0 1rem' }}>9. Changes to Terms</h2>
+                    <p>
+                        We may update these Terms at our discretion for legal, operational, or payment-compliance reasons.
+                        Continued use after update constitutes acceptance of revised Terms.
+                    </p>
                 </div>
             </section>
         </main>
