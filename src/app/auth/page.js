@@ -1,6 +1,8 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, Suspense } from 'react';
-import { supabase } from '../../lib/supabase';
+import { auth, db } from '../../lib/firebase';
+import { GoogleAuthProvider, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, User, Phone, ArrowLeft, ArrowRight, Shield } from 'lucide-react';
@@ -17,27 +19,30 @@ function AuthContent() {
         name: '',
         whatsapp: '',
         email: '',
-        password: '',
-        otp: ''
+        password: ''
     });
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ text: '', type: '' });
-    const [resendTimer, setResendTimer] = useState(0);
-    const [verifyType, setVerifyType] = useState('signup'); // 'signup' or 'recovery'
-
-    useEffect(() => {
-        let interval;
-        if (resendTimer > 0) {
-            interval = setInterval(() => {
-                setResendTimer((prev) => prev - 1);
-            }, 1000);
-        }
-        return () => clearInterval(interval);
-    }, [resendTimer]);
 
     useEffect(() => {
         setMode(initialMode);
     }, [initialMode]);
+
+    const getAuthErrorMessage = (error) => {
+        const code = error?.code || '';
+
+        if (code === 'auth/email-already-in-use') return 'This email is already registered. Please log in instead.';
+        if (code === 'auth/invalid-email') return 'Please enter a valid email address.';
+        if (code === 'auth/weak-password') return 'Password should be at least 6 characters.';
+        if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
+            return 'Invalid email or password.';
+        }
+        if (code === 'auth/popup-closed-by-user') return 'Google sign-in popup was closed before completing sign-in.';
+        if (code === 'auth/popup-blocked') return 'Popup was blocked by the browser. Please allow popups and try again.';
+        if (code === 'auth/too-many-requests') return 'Too many requests. Please wait and try again.';
+
+        return error?.message || 'An unexpected error occurred.';
+    };
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -50,104 +55,62 @@ function AuthContent() {
 
         try {
             if (mode === 'signup') {
-                const { data, error } = await supabase.auth.signUp({
+                const credential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+                await updateProfile(credential.user, { displayName: formData.name });
+                await setDoc(doc(db, 'users', credential.user.uid), {
                     email: formData.email,
-                    password: formData.password,
-                    options: {
-                        data: {
-                            full_name: formData.name,
-                            whatsapp_number: formData.whatsapp,
-                        }
-                    }
-                });
-
-                if (error) throw error;
-                if (data?.user?.identities?.length === 0) {
-                    throw new Error('This email is already registered.');
+                    name: formData.name,
+                    whatsapp: formData.whatsapp,
+                    created_at: new Date().toISOString()
+                }, { merge: true });
+                await sendEmailVerification(credential.user);
+                await signOut(auth);
+                setMessage({ text: 'Signup successful! A verification email has been sent. Please verify your email, then log in.', type: 'success' });
+                setMode('login');
+            } else if (mode === 'login') {
+                const credential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+                if (!credential.user.emailVerified) {
+                    await sendEmailVerification(credential.user);
+                    await signOut(auth);
+                    throw new Error('Your email is not verified. A new verification email has been sent.');
                 }
-
-                setMessage({ text: 'Signup successful! Please check your email for an 8-digit verification code.', type: 'success' });
-                setVerifyType('signup');
-                setMode('verify-otp');
-                setResendTimer(60);
-            }
-            else if (mode === 'verify-otp') {
-                const { data, error } = await supabase.auth.verifyOtp({
-                    email: formData.email,
-                    token: formData.otp,
-                    type: verifyType, // dynamically 'signup' or 'recovery'
-                });
-                if (error) throw error;
-
-                if (verifyType === 'signup') {
-                    setMessage({ text: 'Email verified successfully! Logging you in...', type: 'success' });
-                    setTimeout(() => router.push('/dashboard'), 1500);
-                } else if (verifyType === 'recovery') {
-                    setMessage({ text: 'OTP Verified! Please enter your new password.', type: 'success' });
-                    setMode('update-password');
-                }
-            }
-            else if (mode === 'update-password') {
-                const { data, error } = await supabase.auth.updateUser({
-                    password: formData.password
-                });
-                if (error) throw error;
-
-                setMessage({ text: 'Password updated successfully! Logging you in...', type: 'success' });
-                setTimeout(() => router.push('/dashboard'), 1500);
-            }
-            else if (mode === 'login') {
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: formData.email,
-                    password: formData.password,
-                });
-                if (error) throw error;
                 router.push('/dashboard');
-            }
-            else if (mode === 'forgot-password') {
-                const { data, error } = await supabase.auth.resetPasswordForEmail(formData.email);
-                if (error) throw error;
-                setMessage({ text: 'OTP sent to your email! Please enter it to reset your password.', type: 'success' });
-                setVerifyType('recovery');
-                setMode('verify-otp');
-                setResendTimer(60);
+            } else if (mode === 'forgot-password') {
+                const resetLink = typeof window !== 'undefined' ? `${window.location.origin}/reset-password` : undefined;
+                await sendPasswordResetEmail(auth, formData.email, resetLink ? { url: resetLink, handleCodeInApp: true } : undefined);
+                setMessage({ text: 'Password reset link has been sent to your email.', type: 'success' });
             }
         } catch (error) {
-            let errorMsg = error.message || 'An unexpected error occurred.';
-            if (errorMsg.toLowerCase().includes('rate limit')) {
-                errorMsg = 'Too many requests. Please wait a minute before trying again.';
-            }
-            setMessage({ text: errorMsg, type: 'error' });
+            setMessage({ text: getAuthErrorMessage(error), type: 'error' });
         } finally {
             setLoading(false);
         }
     };
 
-    const handleResendOtp = async () => {
-        if (resendTimer > 0) return;
+    const handleGoogleAuth = async () => {
         setLoading(true);
         setMessage({ text: '', type: '' });
 
         try {
-            if (verifyType === 'signup') {
-                const { error } = await supabase.auth.resend({
-                    type: 'signup',
-                    email: formData.email,
-                });
-                if (error) throw error;
-            } else if (verifyType === 'recovery') {
-                const { error } = await supabase.auth.resetPasswordForEmail(formData.email);
-                if (error) throw error;
-            }
+            const provider = new GoogleAuthProvider();
+            const credential = await signInWithPopup(auth, provider);
+            const user = credential.user;
 
-            setMessage({ text: 'A new 8-digit verification code has been sent to your email.', type: 'success' });
-            setResendTimer(60);
+            // Do not block navigation on profile sync; write in background.
+            void setDoc(doc(db, 'users', user.uid), {
+                email: user.email,
+                name: user.displayName || 'Google User',
+                whatsapp: user.phoneNumber || '',
+                photo_url: user.photoURL || '',
+                provider: 'google',
+                created_at: new Date().toISOString()
+            }, { merge: true }).catch((syncError) => {
+                console.error('Google profile sync failed:', syncError);
+            });
+
+            router.push('/dashboard');
         } catch (error) {
-            let errorMsg = error.message || 'Failed to resend OTP.';
-            if (errorMsg.toLowerCase().includes('rate limit')) {
-                errorMsg = 'Too many requests. Please wait a minute before trying again.';
-            }
-            setMessage({ text: errorMsg, type: 'error' });
+            setMessage({ text: getAuthErrorMessage(error), type: 'error' });
         } finally {
             setLoading(false);
         }
@@ -162,8 +125,6 @@ function AuthContent() {
     return (
         <div className="authContainer">
             <div className="authCard">
-
-                {/* Left Side: Branding / Graphic */}
                 <div className="authLeft">
                     <div className="authLeftGlow" />
 
@@ -187,7 +148,6 @@ function AuthContent() {
                     </div>
                 </div>
 
-                {/* Right Side: Form */}
                 <div className="authRight">
                     <AnimatePresence mode="wait">
                         <motion.div
@@ -203,15 +163,11 @@ function AuthContent() {
                                     {mode === 'login' && 'Log In'}
                                     {mode === 'signup' && 'Create an Account'}
                                     {mode === 'forgot-password' && 'Reset Password'}
-                                    {mode === 'verify-otp' && 'Verify Email'}
-                                    {mode === 'update-password' && 'Create New Password'}
                                 </h1>
                                 <p className="formDesc">
                                     {mode === 'login' && 'Enter your credentials to access your account.'}
-                                    {mode === 'signup' && 'Join us to get started with MJ Tech.'}
-                                    {mode === 'forgot-password' && "Enter your email and we'll send an 8-digit OTP."}
-                                    {mode === 'verify-otp' && "Enter the 8-digit code sent to your email."}
-                                    {mode === 'update-password' && "Please set your new password below."}
+                                    {mode === 'signup' && 'Join us to get started with MJ Tech Global.'}
+                                    {mode === 'forgot-password' && "Enter your email and we'll send a password reset link."}
                                 </p>
                             </div>
 
@@ -253,81 +209,40 @@ function AuthContent() {
                                     </>
                                 )}
 
-                                {mode === 'verify-otp' ? (
-                                    <>
-                                        <div className="formGroup">
-                                            <label className="formLabel">Verification Code (OTP)</label>
-                                            <div className="inputWrapper">
-                                                <Shield size={18} className="inputIcon" />
-                                                <input
-                                                    type="text" name="otp" required value={formData.otp} onChange={handleChange}
-                                                    className="inputField"
-                                                    placeholder="12345678"
-                                                    maxLength={8}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-10px', marginBottom: '15px' }}>
-                                            <button
-                                                type="button"
-                                                onClick={handleResendOtp}
-                                                disabled={resendTimer > 0 || loading}
-                                                className="forgotLink"
-                                                style={{ fontSize: '0.85rem', opacity: resendTimer > 0 ? 0.6 : 1, cursor: resendTimer > 0 ? 'not-allowed' : 'pointer' }}
-                                            >
-                                                {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : 'Resend OTP'}
-                                            </button>
-                                        </div>
-                                    </>
-                                ) : mode === 'update-password' ? (
+                                <>
                                     <div className="formGroup">
-                                        <label className="formLabel">New Password</label>
+                                        <label className="formLabel">Email Address</label>
                                         <div className="inputWrapper">
-                                            <Lock size={18} className="inputIcon" />
+                                            <Mail size={18} className="inputIcon" />
                                             <input
-                                                type="password" name="password" required value={formData.password} onChange={handleChange}
+                                                type="email" name="email" required value={formData.email} onChange={handleChange}
                                                 className="inputField"
-                                                placeholder="••••••••"
-                                                minLength={6}
+                                                placeholder="you@example.com"
                                             />
                                         </div>
                                     </div>
-                                ) : (
-                                    <>
+
+                                    {mode !== 'forgot-password' && (
                                         <div className="formGroup">
-                                            <label className="formLabel">Email Address</label>
+                                            <div className="formLabelRow">
+                                                <label className="formLabel" style={{ marginBottom: 0 }}>Password</label>
+                                                {mode === 'login' && (
+                                                    <button type="button" onClick={() => { setMode('forgot-password'); setMessage({ text: '', type: '' }); }} className="forgotLink">
+                                                        Forgot?
+                                                    </button>
+                                                )}
+                                            </div>
                                             <div className="inputWrapper">
-                                                <Mail size={18} className="inputIcon" />
+                                                <Lock size={18} className="inputIcon" />
                                                 <input
-                                                    type="email" name="email" required value={formData.email} onChange={handleChange}
+                                                    type="password" name="password" required value={formData.password} onChange={handleChange}
                                                     className="inputField"
-                                                    placeholder="you@example.com"
+                                                    placeholder="********"
                                                 />
                                             </div>
                                         </div>
-
-                                        {mode !== 'forgot-password' && (
-                                            <div className="formGroup">
-                                                <div className="formLabelRow">
-                                                    <label className="formLabel" style={{ marginBottom: 0 }}>Password</label>
-                                                    {mode === 'login' && (
-                                                        <button type="button" onClick={() => { setMode('forgot-password'); setMessage({ text: '', type: '' }); }} className="forgotLink">
-                                                            Forgot?
-                                                        </button>
-                                                    )}
-                                                </div>
-                                                <div className="inputWrapper">
-                                                    <Lock size={18} className="inputIcon" />
-                                                    <input
-                                                        type="password" name="password" required value={formData.password} onChange={handleChange}
-                                                        className="inputField"
-                                                        placeholder="••••••••"
-                                                    />
-                                                </div>
-                                            </div>
-                                        )}
-                                    </>
-                                )}
+                                    )}
+                                </>
 
                                 <button
                                     type="submit"
@@ -340,13 +255,30 @@ function AuthContent() {
                                         <>
                                             {mode === 'login' && 'Log In to Account'}
                                             {mode === 'signup' && 'Create Account'}
-                                            {mode === 'forgot-password' && 'Send OTP'}
-                                            {mode === 'verify-otp' && 'Verify OTP'}
-                                            {mode === 'update-password' && 'Update Password'}
+                                            {mode === 'forgot-password' && 'Send Reset Link'}
                                             <ArrowRight size={18} />
                                         </>
                                     )}
                                 </button>
+
+                                {(mode === 'login' || mode === 'signup') && (
+                                    <>
+                                        <div className="authDivider">
+                                            <span>or continue with</span>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={handleGoogleAuth}
+                                            disabled={loading}
+                                            className="googleBtn"
+                                        >
+                                            <svg viewBox="0 0 24 24" className="googleIcon" aria-hidden="true">
+                                                <path d="M21.35 11.1H12v2.98h5.37c-.23 1.52-1.73 4.47-5.37 4.47-3.24 0-5.87-2.68-5.87-5.98S8.76 6.6 12 6.6c1.84 0 3.07.78 3.77 1.45l2.57-2.5C16.71 4.03 14.55 3 12 3 7.03 3 3 7.03 3 12s4.03 9 9 9c5.2 0 8.64-3.65 8.64-8.79 0-.59-.06-1.04-.14-1.49z" fill="currentColor" />
+                                            </svg>
+                                            {mode === 'login' ? 'Continue with Google' : 'Sign up with Google'}
+                                        </button>
+                                    </>
+                                )}
                             </form>
 
                             <div className="switchText">
@@ -358,7 +290,7 @@ function AuthContent() {
                                         </button>
                                     </p>
                                 )}
-                                {(mode === 'signup' || mode === 'forgot-password' || mode === 'verify-otp' || mode === 'update-password') && (
+                                {(mode === 'signup' || mode === 'forgot-password') && (
                                     <p>
                                         <button type="button" onClick={() => { setMode('login'); setMessage({ text: '', type: '' }); }} className="switchBtn">
                                             <ArrowLeft size={16} /> Back to Log In
