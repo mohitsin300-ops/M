@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { Suspense, useState, useEffect } from 'react';
 import { auth } from '../../lib/firebase';
 import { confirmPasswordReset, verifyPasswordResetCode } from 'firebase/auth';
@@ -123,3 +123,6 @@ export default function ResetPassword() {
         </Suspense>
     );
 }
+
+
+
