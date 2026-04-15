@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Menu, X, UserPlus, LogIn, LayoutDashboard, User, LogOut, ChevronDown } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { auth } from '../lib/firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import './Navbar.css';
 
@@ -15,19 +16,13 @@ export default function Navbar() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
     useEffect(() => {
-        // Fetch current session
-        const getSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            setUser(session?.user || null);
-        };
-        getSession();
+        setUser(auth.currentUser || null);
 
-        // Listen for auth changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user || null);
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser || null);
         });
 
-        return () => subscription.unsubscribe();
+        return () => unsubscribe();
     }, []);
 
     useEffect(() => {
@@ -48,7 +43,7 @@ export default function Navbar() {
     ];
 
     const handleLogout = async () => {
-        await supabase.auth.signOut();
+        await signOut(auth);
         setDropdownOpen(false);
         setIsOpen(false);
         router.push('/');
@@ -85,10 +80,10 @@ export default function Navbar() {
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     fontWeight: 'bold', fontSize: '0.8rem'
                                 }}>
-                                    {user.user_metadata?.full_name?.charAt(0) || user.email.charAt(0).toUpperCase()}
+                                    {user.displayName?.charAt(0) || user.email?.charAt(0).toUpperCase()}
                                 </div>
                                 <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>
-                                    {user.user_metadata?.full_name?.split(' ')[0] || 'User'}
+                                    {user.displayName?.split(' ')[0] || 'User'}
                                 </span>
                                 <ChevronDown size={16} style={{ transition: 'transform 0.2s', transform: dropdownOpen ? 'rotate(180deg)' : 'none' }} />
                             </button>
@@ -101,7 +96,7 @@ export default function Navbar() {
                                 }}>
                                     <div style={{ padding: '0.5rem', borderBottom: '1px solid #27272a', marginBottom: '0.5rem' }}>
                                         <p style={{ fontSize: '0.85rem', color: '#a1a1aa', margin: 0 }}>Signed in as</p>
-                                        <p style={{ fontSize: '0.85rem', fontWeight: 'bold', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={user.email}>
+                                        <p style={{ fontSize: '0.85rem', fontWeight: 'bold', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={user.email || ''}>
                                             {user.email}
                                         </p>
                                     </div>
@@ -154,10 +149,10 @@ export default function Navbar() {
                                 <div style={{
                                     background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1rem', color: 'white'
                                 }}>
-                                    {user.user_metadata?.full_name?.charAt(0) || user.email.charAt(0).toUpperCase()}
+                                    {user.displayName?.charAt(0) || user.email?.charAt(0).toUpperCase()}
                                 </div>
                                 <div>
-                                    <p style={{ fontWeight: 'bold', margin: 0, color: 'white' }}>{user.user_metadata?.full_name || 'User'}</p>
+                                    <p style={{ fontWeight: 'bold', margin: 0, color: 'white' }}>{user.displayName || 'User'}</p>
                                     <p style={{ fontSize: '0.8rem', color: '#a1a1aa', margin: 0 }}>{user.email}</p>
                                 </div>
                             </div>

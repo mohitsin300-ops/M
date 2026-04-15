@@ -117,9 +117,8 @@
     }
 }
 
-/* Trust Badges - MSME & Founder */
-.msme-badge,
-.founder-badge {
+/* Trust Badge - MSME */
+.msme-badge {
     display: inline-flex;
     align-items: center;
     gap: 12px;
@@ -131,8 +130,7 @@
     transition: all 0.3s ease;
 }
 
-.msme-badge:hover,
-.founder-badge:hover {
+.msme-badge:hover {
     transform: translateY(-2px);
     border-color: rgba(0, 112, 243, 0.4);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
@@ -170,30 +168,3 @@
     max-width: 220px;
 }
 
-.founder-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent) 0%, #00d2ff 100%);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 1rem;
-    box-shadow: 0 4px 10px rgba(0, 112, 243, 0.3);
-}
-
-.founder-name {
-    margin: 0;
-    font-weight: 700;
-    color: var(--text-main);
-    font-size: 1.05rem;
-}
-
-.founder-title {
-    margin: 0;
-    font-size: 0.85rem;
-    color: var(--accent);
-    font-weight: 600;
-}

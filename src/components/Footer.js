@@ -21,15 +21,7 @@ export default function Footer() {
                                 <div className="msme-info">
                                     <p className="msme-title">Government Registered</p>
                                     <p className="msme-text">MSME Certified Company</p>
-                                    <p className="msme-urn">UDYAM-UP-13-0023373</p>
-                                </div>
-                            </div>
-
-                            <div className="founder-badge">
-                                <div className="founder-avatar">MS</div>
-                                <div className="founder-info">
-                                    <p className="founder-name">Mohit Singh</p>
-                                    <p className="founder-title">Founder & CEO</p>
+                                    <p className="msme-urn">udyam-up-13-0023373</p>
                                 </div>
                             </div>
                         </div>
@@ -49,6 +41,7 @@ export default function Footer() {
                         <Link href="/contact">Contact Us</Link>
                         <Link href="/privacy-policy">Privacy Policy</Link>
                         <Link href="/terms">Terms & Conditions</Link>
+                        <Link href="/refund-policy">Refund Policy</Link>
                     </div>
 
                     <div className="footer-contact">
