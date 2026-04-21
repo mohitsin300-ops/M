@@ -63,6 +63,12 @@ export default function Contact() {
                     </div>
 
                     <div style={{ marginBottom: '2rem' }}>
+                        <h3 style={{ fontSize: '1.2rem', color: 'var(--accent)', marginBottom: '0.5rem' }}>Leadership</h3>
+                        <p style={{ color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: '600' }}>Mohit Singh</p>
+                        <p style={{ color: 'var(--text-muted)', marginTop: '0.35rem' }}>Founder &amp; CEO, MJ Tech Global</p>
+                    </div>
+
+                    <div style={{ marginBottom: '2rem' }}>
                         <h3 style={{ fontSize: '1.2rem', color: 'var(--accent)', marginBottom: '0.5rem' }}>Business Hours</h3>
                         <p style={{ color: 'var(--text-muted)' }}>Monday - Friday</p>
                         <p style={{ color: 'var(--text-muted)' }}>9:00 AM - 6:00 PM (IST)</p>
