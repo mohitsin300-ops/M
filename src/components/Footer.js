@@ -15,6 +15,9 @@ export default function Footer() {
                         <p className="footer-desc">
                             Innovating the future with premium web, application, and AI development solutions tailored for global enterprises.
                         </p>
+                        <p className="footer-note" style={{ marginTop: '0.5rem', fontWeight: 600 }}>
+                            Technical Head: Mr. Rohit
+                        </p>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.5rem' }}>
                             <div className="msme-badge">
                                 <span className="msme-icon">🇮🇳</span>
