@@ -115,7 +115,7 @@ export default function Certificate({ data }) {
                                 <img src="/signature.png" alt="Signature" className="cert-signature-img" />
                                 <div className="signature-line"></div>
                                 <p>Authorized Signatory</p>
-                                <p className="signatory-title">Founder &amp; CEO, MJ Tech Global</p>
+                                <p className="signatory-title">Technical Head, MJ Tech Global</p>
                             </div>
 
                             <div className="cert-qr">
