@@ -1,67 +1,62 @@
 'use client'
 
 import { motion } from 'framer-motion';
+import { siteConfig } from '../../lib/siteConfig';
+import { Shield } from 'lucide-react';
 
 export default function RefundPolicy() {
     return (
-        <main className="main-content">
-            <section style={{ padding: '6rem 2rem 4rem', textAlign: 'center' }}>
-                <motion.h1
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-gradient"
-                    style={{ fontSize: '3rem', marginBottom: '1rem' }}
-                >
-                    Refund Policy
-                </motion.h1>
+        <main style={{ paddingTop: '80px', minHeight: '100vh', background: 'var(--light-bg)' }}>
+            <section style={{ padding: '4.5rem 1.5rem 2.5rem', textAlign: 'center' }}>
+                <div className="container" style={{ maxWidth: '800px' }}>
+                    <span className="badge badge-primary" style={{ marginBottom: '1rem' }}>
+                        <Shield size={14} /> Purchases &amp; Billing
+                    </span>
+                    <h1 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '0.75rem', letterSpacing: '-0.02em' }}>
+                        Refund Policy
+                    </h1>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
+                        Last Updated: March 2026 &bull; MJ Tech Global
+                    </p>
+                </div>
             </section>
 
-            <section style={{ padding: '2rem 2rem 8rem', maxWidth: '800px', margin: '0 auto', color: 'var(--text-muted)', lineHeight: '1.8' }}>
-                <div style={{ background: 'var(--glass-bg)', padding: '3rem', borderRadius: '16px', border: '1px solid var(--glass-border)' }}>
-                    <p style={{ marginBottom: '1.5rem' }}>Last Updated: {new Date().toLocaleDateString()}</p>
+            <section style={{ padding: '0 1.5rem 6rem' }}>
+                <div className="container" style={{ maxWidth: '850px' }}>
+                    <div className="card-light" style={{ padding: '3.5rem', borderRadius: '24px', fontSize: '1rem', lineHeight: 1.8, color: 'var(--text-secondary)' }}>
+                        <h2 style={{ color: 'var(--text-main)', fontSize: '1.4rem', fontWeight: 800, marginTop: 0, marginBottom: '1rem' }}>
+                            1. Digital Software &amp; Purchases
+                        </h2>
+                        <p style={{ marginBottom: '1.5rem' }}>
+                            MJ Tech Global provides digital applications, software tools, and digital services. All in-app purchases or subscriptions initiated through the Google Play Store are processed subject to Google Play billing policies and consumer protection guidelines.
+                        </p>
 
-                    <h2 style={{ color: 'var(--text-main)', fontSize: '1.5rem', margin: '2rem 0 1rem' }}>1. General Policy</h2>
-                    <p>
-                        MJ Tech Global provides digital services and content. Due to the nature of digital delivery,
-                        refunds are generally limited once access is granted, unless otherwise required by applicable law.
-                    </p>
+                        <h2 style={{ color: 'var(--text-main)', fontSize: '1.4rem', fontWeight: 800, marginTop: '2.5rem', marginBottom: '1rem' }}>
+                            2. Eligible Refund Circumstances
+                        </h2>
+                        <p style={{ marginBottom: '1rem' }}>We review refund claims under the following circumstances:</p>
+                        <ul style={{ paddingLeft: '1.5rem', marginBottom: '1.5rem' }}>
+                            <li>Verified technical failure where paid digital features could not be delivered despite reasonable developer troubleshooting.</li>
+                            <li>Duplicate payment or accidental double-charge caused by billing gateway glitches.</li>
+                            <li>Requests submitted in accordance with statutory consumer cooling-off rights.</li>
+                        </ul>
 
-                    <h2 style={{ color: 'var(--text-main)', fontSize: '1.5rem', margin: '2rem 0 1rem' }}>2. Subscription Charges</h2>
-                    <p>
-                        Subscription charges are billed as per the selected plan cycle. Auto-renewal can be canceled for
-                        future billing cycles before renewal date. Already processed recurring payments are normally non-refundable,
-                        except in verified duplicate charge, technical failure, or legal entitlement cases.
-                    </p>
+                        <h2 style={{ color: 'var(--text-main)', fontSize: '1.4rem', fontWeight: 800, marginTop: '2.5rem', marginBottom: '1rem' }}>
+                            3. Refund Request Process
+                        </h2>
+                        <p style={{ marginBottom: '1.5rem' }}>
+                            To request an inquiry or refund regarding any MJ Tech Global software product, please contact our support team at <a href={`mailto:${siteConfig.emails.support}`} style={{ color: 'var(--primary-blue)' }}>{siteConfig.emails.support}</a> within 7 days of the transaction, including your order number, registered account email, and reason for the request.
+                        </p>
 
-                    <h2 style={{ color: 'var(--text-main)', fontSize: '1.5rem', margin: '2rem 0 1rem' }}>3. Eligible Refund Scenarios</h2>
-                    <p>
-                        Refund requests may be considered in cases such as duplicate payment, accidental multiple debit,
-                        failed service provisioning, or payment captured but service not activated within a reasonable period.
-                    </p>
-
-                    <h2 style={{ color: 'var(--text-main)', fontSize: '1.5rem', margin: '2rem 0 1rem' }}>4. Non-Refundable Cases</h2>
-                    <p>
-                        Refunds are typically not provided for partial usage, change of mind, inactivity,
-                        account suspension due to policy violation, or missed cancellation before renewal.
-                    </p>
-
-                    <h2 style={{ color: 'var(--text-main)', fontSize: '1.5rem', margin: '2rem 0 1rem' }}>5. Request Timeline</h2>
-                    <p>
-                        Refund requests should be raised within 7 days of the relevant transaction,
-                        along with payment reference, registered email, and issue details.
-                    </p>
-
-                    <h2 style={{ color: 'var(--text-main)', fontSize: '1.5rem', margin: '2rem 0 1rem' }}>6. Processing Time</h2>
-                    <p>
-                        Approved refunds are initiated to the original payment method. Final credit timeline depends on
-                        bank or payment gateway and may take 5 to 10 business days.
-                    </p>
-
-                    <h2 style={{ color: 'var(--text-main)', fontSize: '1.5rem', margin: '2rem 0 1rem' }}>7. Contact for Refund Support</h2>
-                    <p>
-                        Email refund requests to <strong>mjtechglobal@zohomail.in</strong> or <strong>mjtechbharat@gmail.com</strong>
-                        with subject line: Refund Request - App Name.
-                    </p>
+                        <h2 style={{ color: 'var(--text-main)', fontSize: '1.4rem', fontWeight: 800, marginTop: '2.5rem', marginBottom: '1rem' }}>
+                            4. Support Contact
+                        </h2>
+                        <p style={{ margin: 0 }}>
+                            <strong>App &amp; Store Support:</strong> <a href={`mailto:${siteConfig.emails.support}`} style={{ color: 'var(--primary-blue)' }}>{siteConfig.emails.support}</a><br />
+                            <strong>Business Correspondence:</strong> <a href={`mailto:${siteConfig.emails.businessSupplied}`} style={{ color: 'var(--primary-blue)' }}>{siteConfig.emails.businessSupplied}</a><br />
+                            <strong>Entity:</strong> MJ Tech Global, India (MSME URN: {siteConfig.registration.urn})
+                        </p>
+                    </div>
                 </div>
             </section>
         </main>

@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Menu, X, UserPlus, LogIn, LayoutDashboard, User, LogOut, ChevronDown } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { Menu, X, User, LogOut, LayoutDashboard, ChevronDown, Sparkles, ShieldCheck, ArrowRight } from 'lucide-react';
 import { auth } from '../lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
@@ -10,6 +11,7 @@ import './Navbar.css';
 
 export default function Navbar() {
     const router = useRouter();
+    const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [user, setUser] = useState(null);
@@ -27,19 +29,26 @@ export default function Navbar() {
 
     useEffect(() => {
         const handleScroll = () => {
-            setScrolled(window.scrollY > 50);
+            setScrolled(window.scrollY > 20);
         };
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // Close mobile menu on route change
+    useEffect(() => {
+        setIsOpen(false);
+        setDropdownOpen(false);
+    }, [pathname]);
+
     const navLinks = [
         { name: 'Home', path: '/' },
-        { name: 'About Us', path: '/about' },
+        { name: 'Products', path: '/products' },
         { name: 'Services', path: '/services' },
-        { name: 'Portfolio', path: '/portfolio' },
+        { name: 'Technology', path: '/technology' },
+        { name: 'AI Innovation', path: '/ai-innovation' },
+        { name: 'About', path: '/about' },
         { name: 'Contact', path: '/contact' },
-        { name: 'Verify Certificate', path: '/verify' },
     ];
 
     const handleLogout = async () => {
@@ -50,149 +59,184 @@ export default function Navbar() {
     };
 
     return (
-        <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+        <header className={`navbar-header ${scrolled ? 'is-scrolled' : ''}`}>
             <div className="nav-container">
-                <Link href="/" className="logo" style={{ display: 'flex', alignItems: 'center', gap: '10px', whiteSpace: 'nowrap' }}>
-                    <img src="/logo.png" alt="Logo" style={{ height: '35px', width: 'auto', objectFit: 'contain' }} />
-                    <span style={{ fontSize: '1.2rem', fontWeight: '700' }}>MJ Tech Global</span>
+                <Link href="/" className="nav-logo" aria-label="MJ Tech Global Home">
+                    <img src="/logo.png" alt="MJ Tech Global" className="logo-img" />
+                    <div className="logo-text-wrapper">
+                        <span className="logo-title">MJ Tech Global</span>
+                        <span className="logo-tag">Software &amp; AI</span>
+                    </div>
                 </Link>
 
-                <div className="desktop-menu">
-                    {navLinks.map((link) => (
-                        <Link key={link.name} href={link.path} className="nav-link">
-                            {link.name}
-                        </Link>
-                    ))}
-                    {user ? (
-                        <div className="profile-menu-container" style={{ position: 'relative', marginLeft: '1rem' }}>
-                            <button
-                                onClick={() => setDropdownOpen(!dropdownOpen)}
-                                className="profile-btn flex items-center gap-2"
-                                style={{
-                                    background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',
-                                    padding: '0.4rem 0.8rem', borderRadius: '20px', cursor: 'pointer', color: 'white',
-                                    display: 'flex', alignItems: 'center'
-                                }}
-                            >
-                                <div style={{
-                                    background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
-                                    width: '28px', height: '28px', borderRadius: '50%',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontWeight: 'bold', fontSize: '0.8rem'
-                                }}>
-                                    {user.displayName?.charAt(0) || user.email?.charAt(0).toUpperCase()}
-                                </div>
-                                <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>
-                                    {user.displayName?.split(' ')[0] || 'User'}
-                                </span>
-                                <ChevronDown size={16} style={{ transition: 'transform 0.2s', transform: dropdownOpen ? 'rotate(180deg)' : 'none' }} />
-                            </button>
+                {/* Desktop Navigation */}
+                <nav className="desktop-nav" aria-label="Main Navigation">
+                    <div className="nav-links-wrapper">
+                        {navLinks.map((link) => {
+                            const isActive = pathname === link.path || (link.path !== '/' && pathname.startsWith(link.path));
+                            return (
+                                <Link
+                                    key={link.name}
+                                    href={link.path}
+                                    className={`nav-link ${isActive ? 'is-active' : ''}`}
+                                >
+                                    {link.name}
+                                    {isActive && <span className="active-dot" />}
+                                </Link>
+                            );
+                        })}
+                    </div>
 
-                            {dropdownOpen && (
-                                <div className="profile-dropdown" style={{
-                                    position: 'absolute', top: 'calc(100% + 10px)', right: 0,
-                                    background: '#0a0a0a', border: '1px solid #27272a', borderRadius: '12px',
-                                    padding: '0.5rem', width: '200px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', zIndex: 50
-                                }}>
-                                    <div style={{ padding: '0.5rem', borderBottom: '1px solid #27272a', marginBottom: '0.5rem' }}>
-                                        <p style={{ fontSize: '0.85rem', color: '#a1a1aa', margin: 0 }}>Signed in as</p>
-                                        <p style={{ fontSize: '0.85rem', fontWeight: 'bold', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={user.email || ''}>
-                                            {user.email}
-                                        </p>
+                    <div className="nav-actions">
+                        {/* Secondary Utility Link */}
+                        <Link href="/verify" className="utility-nav-link" title="Verify Certificate">
+                            <ShieldCheck size={16} />
+                            <span>Verify</span>
+                        </Link>
+
+                        {/* User Profile or Login */}
+                        {user ? (
+                            <div className="profile-menu-container">
+                                <button
+                                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                                    className="profile-btn"
+                                    aria-expanded={dropdownOpen}
+                                    aria-haspopup="true"
+                                >
+                                    <div className="profile-avatar">
+                                        {user.displayName?.charAt(0) || user.email?.charAt(0).toUpperCase()}
                                     </div>
-                                    <Link href="/dashboard" onClick={() => setDropdownOpen(false)} style={{
-                                        display: 'flex', alignItems: 'center', gap: '8px', padding: '0.6rem', color: '#e4e4e7', textDecoration: 'none', borderRadius: '8px', fontSize: '0.9rem', transition: 'background 0.2s'
-                                    }} onMouseEnter={(e) => e.currentTarget.style.background = '#27272a'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
-                                        <LayoutDashboard size={16} /> Dashboard
-                                    </Link>
-                                    <button onClick={handleLogout} style={{
-                                        display: 'flex', alignItems: 'center', gap: '8px', padding: '0.6rem', color: '#f87171', background: 'transparent', border: 'none', width: '100%', textAlign: 'left', borderRadius: '8px', fontSize: '0.9rem', cursor: 'pointer', transition: 'background 0.2s'
-                                    }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
-                                        <LogOut size={16} /> Logout
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <Link href="/auth" style={{
-                            marginLeft: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '38px', height: '38px',
-                            background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '50%', color: 'white', transition: 'all 0.2s'
-                        }} onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.2)'; e.currentTarget.style.transform = 'scale(1.05)' }} onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.transform = 'scale(1)' }} title="Login / Sign Up">
-                            <User size={18} />
-                        </Link>
-                    )}
-                    <Link href="/internship" className="btn-primary" style={{ marginLeft: '1rem' }}>
-                        Internship Apply
-                    </Link>
-                </div>
+                                    <span className="profile-name">
+                                        {user.displayName?.split(' ')[0] || 'User'}
+                                    </span>
+                                    <ChevronDown size={14} className={`chevron-icon ${dropdownOpen ? 'is-open' : ''}`} />
+                                </button>
 
-                <button className="mobile-toggle" onClick={() => setIsOpen(!isOpen)}>
-                    {isOpen ? <X size={28} /> : <Menu size={28} />}
+                                {dropdownOpen && (
+                                    <div className="profile-dropdown-menu">
+                                        <div className="dropdown-header">
+                                            <p className="dropdown-signed">Signed in as</p>
+                                            <p className="dropdown-email" title={user.email || ''}>
+                                                {user.email}
+                                            </p>
+                                        </div>
+                                        <Link href="/dashboard" className="dropdown-item">
+                                            <LayoutDashboard size={15} /> Dashboard
+                                        </Link>
+                                        <button onClick={handleLogout} className="dropdown-item logout-item">
+                                            <LogOut size={15} /> Sign out
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <Link href="/auth" className="login-icon-btn" title="Sign In">
+                                <User size={18} />
+                            </Link>
+                        )}
+
+                        {/* Primary Explore Products CTA */}
+                        <Link href="/products" className="btn-explore-cta">
+                            <Sparkles size={15} />
+                            <span>Explore Products</span>
+                        </Link>
+                    </div>
+                </nav>
+
+                {/* Mobile Toggle Button */}
+                <button
+                    className="mobile-toggle-btn"
+                    onClick={() => setIsOpen(!isOpen)}
+                    aria-label={isOpen ? "Close menu" : "Open menu"}
+                    aria-expanded={isOpen}
+                >
+                    {isOpen ? <X size={24} /> : <Menu size={24} />}
                 </button>
             </div>
 
+            {/* Mobile Drawer Menu */}
             {isOpen && (
-                <div className="mobile-menu">
-                    {navLinks.map((link) => (
-                        <Link
-                            key={link.name}
-                            href={link.path}
-                            className="mobile-nav-link"
-                            onClick={() => setIsOpen(false)}
-                        >
-                            {link.name}
-                        </Link>
-                    ))}
-                    {user ? (
-                        <div style={{ marginTop: '0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', padding: '1rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem' }}>
-                                <div style={{
-                                    background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1rem', color: 'white'
-                                }}>
-                                    {user.displayName?.charAt(0) || user.email?.charAt(0).toUpperCase()}
+                <div className="mobile-drawer-overlay" onClick={() => setIsOpen(false)}>
+                    <div className="mobile-drawer" onClick={(e) => e.stopPropagation()}>
+                        <div className="mobile-drawer-links">
+                            {navLinks.map((link) => {
+                                const isActive = pathname === link.path || (link.path !== '/' && pathname.startsWith(link.path));
+                                return (
+                                    <Link
+                                        key={link.name}
+                                        href={link.path}
+                                        className={`mobile-link ${isActive ? 'is-active' : ''}`}
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        <span>{link.name}</span>
+                                        {isActive && <span className="mobile-active-pill">Active</span>}
+                                    </Link>
+                                );
+                            })}
+
+                            <div className="mobile-divider" />
+
+                            <Link
+                                href="/verify"
+                                className="mobile-link"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <ShieldCheck size={18} color="var(--primary-blue)" /> Verify Certificate
+                                </span>
+                            </Link>
+
+                            <Link
+                                href="/internship"
+                                className="mobile-link"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                <span>Internship Application</span>
+                            </Link>
+                        </div>
+
+                        <div className="mobile-drawer-footer">
+                            {user ? (
+                                <div className="mobile-user-card">
+                                    <div className="mobile-user-row">
+                                        <div className="profile-avatar">
+                                            {user.displayName?.charAt(0) || user.email?.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div style={{ overflow: 'hidden' }}>
+                                            <p style={{ fontWeight: 600, fontSize: '0.9rem' }}>{user.displayName || 'User'}</p>
+                                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user.email}</p>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '12px' }}>
+                                        <Link href="/dashboard" className="btn btn-secondary" style={{ padding: '0.5rem', fontSize: '0.85rem' }} onClick={() => setIsOpen(false)}>
+                                            Dashboard
+                                        </Link>
+                                        <button onClick={handleLogout} className="btn" style={{ padding: '0.5rem', fontSize: '0.85rem', background: 'rgba(239, 68, 68, 0.1)', color: '#EF4444', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                                            Logout
+                                        </button>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p style={{ fontWeight: 'bold', margin: 0, color: 'white' }}>{user.displayName || 'User'}</p>
-                                    <p style={{ fontSize: '0.8rem', color: '#a1a1aa', margin: 0 }}>{user.email}</p>
-                                </div>
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            ) : (
                                 <Link
-                                    href="/dashboard"
-                                    className="btn-primary"
-                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'rgba(255,255,255,0.1)', color: 'white', padding: '0.6rem', borderRadius: '8px' }}
+                                    href="/auth"
+                                    className="btn btn-secondary mobile-auth-btn"
                                     onClick={() => setIsOpen(false)}
                                 >
-                                    <LayoutDashboard size={18} /> Go to Dashboard
+                                    <User size={18} /> Sign In / Account
                                 </Link>
-                                <button
-                                    onClick={handleLogout}
-                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'rgba(239, 68, 68, 0.1)', color: '#f87171', padding: '0.6rem', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.2)', width: '100%', cursor: 'pointer' }}
-                                >
-                                    <LogOut size={18} /> Logout
-                                </button>
-                            </div>
+                            )}
+
+                            <Link
+                                href="/products"
+                                className="btn btn-primary mobile-cta-btn"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                <Sparkles size={16} /> Explore Our Products <ArrowRight size={16} />
+                            </Link>
                         </div>
-                    ) : (
-                        <Link
-                            href="/auth"
-                            className="btn-primary mobile-btn"
-                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)' }}
-                            onClick={() => setIsOpen(false)}
-                        >
-                            <User size={20} /> Login / Sign Up
-                        </Link>
-                    )}
-                    <Link
-                        href="/internship"
-                        className="btn-primary mobile-btn"
-                        style={{ marginTop: '0.5rem', background: 'linear-gradient(to right, #0070f3, #00a6ff)' }}
-                        onClick={() => setIsOpen(false)}
-                    >
-                        Internship Apply
-                    </Link>
+                    </div>
                 </div>
             )}
-        </nav>
+        </header>
     );
 }

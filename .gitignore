@@ -23,3 +23,14 @@ pnpm-debug.log*
 Thumbs.db
 .vscode/
 .idea/
+
+# Flutter & Android build artifacts
+**/build/
+.dart_tool/
+.flutter-plugins*
+.pub/
+.pub-cache/
+android/build/
+**/android/build/
+**/android/app/build/
+**/android/.gradle/

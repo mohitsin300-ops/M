@@ -3,8 +3,8 @@ export default function robots() {
         rules: {
             userAgent: '*',
             allow: '/',
-            disallow: ['/api/'],
+            disallow: ['/api/', '/admin', '/admingo'],
         },
-        sitemap: 'https://mjtechglobal.in/sitemap.xml',
+        sitemap: 'https://www.mjtechglobal.in/sitemap.xml',
     }
 }

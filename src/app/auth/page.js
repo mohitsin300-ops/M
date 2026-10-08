@@ -37,6 +37,10 @@ function AuthContent() {
         if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
             return 'Invalid email or password.';
         }
+        if (code === 'auth/unauthorized-domain') {
+            const host = typeof window !== 'undefined' ? window.location.hostname : 'current domain';
+            return `Google sign-in is not enabled for this domain (${host}). Please contact support.`;
+        }
         if (code === 'auth/popup-closed-by-user') return 'Google sign-in popup was closed before completing sign-in.';
         if (code === 'auth/popup-blocked') return 'Popup was blocked by the browser. Please allow popups and try again.';
         if (code === 'auth/too-many-requests') return 'Too many requests. Please wait and try again.';

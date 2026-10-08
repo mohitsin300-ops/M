@@ -2,71 +2,85 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { siteConfig } from '../../lib/siteConfig';
+import { Briefcase, MapPin, Clock, ArrowRight, Sparkles } from 'lucide-react';
 
 export default function Careers() {
     const jobs = [
-        { title: "Senior React Developer", type: "Contract Base", location: "Remote / India", exp: "1-3 Years" },
-        { title: "UI/UX Designer", type: "Contract Base", location: "Remote", exp: "1-3 Years" },
-        { title: "Next.js Full Stack Engineer", type: "Contract Base", location: "Global", exp: "1-3 Years" },
-        { title: "AI/ML Engineer", type: "Contract Base", location: "Remote / India", exp: "1-3 Years" },
-        { title: "Digital Marketing Executive", type: "Full-Time", location: "Remote / India", exp: "Fresher to 1 Year" }
+        { title: "React & Next.js Full-Stack Engineer", type: "Full-Time / Contract", location: "Remote (India)", exp: "1–3 Years" },
+        { title: "Flutter Mobile Developer", type: "Full-Time / Contract", location: "Remote (India)", exp: "1–3 Years" },
+        { title: "UI/UX & Product Designer", type: "Full-Time / Contract", location: "Remote", exp: "1–3 Years" },
+        { title: "Python & Machine Learning Specialist", type: "Contract", location: "Remote", exp: "2+ Years" }
     ];
 
     return (
-        <main className="main-content">
-            <section style={{ padding: '6rem 2rem 2rem', textAlign: 'center' }}>
-                <motion.h1
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-gradient"
-                    style={{ fontSize: '3.5rem', marginBottom: '1rem' }}
-                >
-                    Join Our Team
-                </motion.h1>
-                <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    style={{ color: 'var(--text-muted)', fontSize: '1.2rem', maxWidth: '700px', margin: '0 auto 1rem' }}
-                >
-                    Build the future of software with MJ Tech Global.
-                </motion.p>
-                <Link href="/internship" className="btn-primary-large" style={{ display: 'inline-block', marginTop: '1rem' }}>Looking for an Internship? Apply Here</Link>
+        <main style={{ paddingTop: '80px', minHeight: '100vh', background: 'var(--light-bg)' }}>
+            {/* Header */}
+            <section style={{ padding: '5rem 1.5rem 3.5rem', textAlign: 'center' }}>
+                <div className="container" style={{ maxWidth: '850px' }}>
+                    <span className="badge badge-primary" style={{ marginBottom: '1rem' }}>
+                        <Briefcase size={14} /> Join The Team
+                    </span>
+                    <h1 style={{ fontSize: '3.25rem', fontWeight: 800, marginBottom: '1.25rem', letterSpacing: '-0.03em' }}>
+                        Careers at <span className="text-gradient">MJ Tech Global</span>
+                    </h1>
+                    <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', lineHeight: 1.65, marginBottom: '1.5rem' }}>
+                        Build practical mobile applications, creator automation tools, and productivity software that reach thousands of daily users.
+                    </p>
+                    <Link href="/internship" className="btn btn-secondary" style={{ padding: '0.65rem 1.25rem', fontSize: '0.9rem' }}>
+                        Looking for an Internship? Click Here &rarr;
+                    </Link>
+                </div>
             </section>
 
-            <section style={{ padding: '4rem 2rem 8rem', maxWidth: '1000px', margin: '0 auto' }}>
-                <h2 style={{ fontSize: '2rem', marginBottom: '2rem' }}>Open Positions ({jobs.length})</h2>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                    {jobs.map((job, idx) => (
-                        <motion.div
-                            key={idx}
-                            initial={{ opacity: 0, x: -20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: idx * 0.1 }}
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                padding: '2rem',
-                                background: 'var(--glass-bg)',
-                                border: '1px solid var(--glass-border)',
-                                borderRadius: '12px',
-                                flexWrap: 'wrap',
-                                gap: '1rem'
-                            }}
-                        >
-                            <div>
-                                <h3 style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>{job.title}</h3>
-                                <div style={{ display: 'flex', gap: '1rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                                    <span>📍 {job.location}</span>
-                                    <span>⏱️ {job.type}</span>
-                                    <span>🎯 {job.exp}</span>
+            {/* Jobs List */}
+            <section style={{ padding: '0 1.5rem 6rem' }}>
+                <div className="container" style={{ maxWidth: '950px' }}>
+                    <h2 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '1.75rem' }}>
+                        Open Positions ({jobs.length})
+                    </h2>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                        {jobs.map((job, idx) => (
+                            <div
+                                key={idx}
+                                className="card-light"
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    padding: '2rem',
+                                    borderRadius: '16px',
+                                    flexWrap: 'wrap',
+                                    gap: '1.25rem'
+                                }}
+                            >
+                                <div>
+                                    <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.5rem' }}>
+                                        {job.title}
+                                    </h3>
+                                    <div style={{ display: 'flex', gap: '1.25rem', color: 'var(--text-muted)', fontSize: '0.85rem', flexWrap: 'wrap' }}>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                            <MapPin size={14} /> {job.location}
+                                        </span>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                            <Clock size={14} /> {job.type}
+                                        </span>
+                                        <span>Target Exp: {job.exp}</span>
+                                    </div>
                                 </div>
+
+                                <a
+                                    href={`mailto:${siteConfig.emails.founder}?subject=Application for ${encodeURIComponent(job.title)}`}
+                                    className="btn btn-primary"
+                                    style={{ padding: '0.65rem 1.25rem', fontSize: '0.9rem' }}
+                                >
+                                    <span>Apply Via Email</span>
+                                    <ArrowRight size={15} />
+                                </a>
                             </div>
-                            <button className="btn-primary" style={{ padding: '0.8rem 1.5rem' }}>Apply Now</button>
-                        </motion.div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             </section>
         </main>

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1083381547820",
+    "project_id": "mjtechglobal-web",
+    "storage_bucket": "mjtechglobal-web.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1083381547820:android:6f7a1b5d3d88c500f8e289",
+        "android_client_info": {
+          "package_name": "com.mjtech.internship"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1083381547820-usfd6id2lm6oek4h42ec57ffktbm8467.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXn4CL29XVfdGfLOmKKiC9LQSEdkKmv6w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1083381547820-usfd6id2lm6oek4h42ec57ffktbm8467.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

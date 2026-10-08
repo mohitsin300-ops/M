@@ -2,38 +2,40 @@
 
 import { motion } from 'framer-motion';
 import { useState, useRef } from 'react';
+import { siteConfig } from '../../lib/siteConfig';
+import {
+    GraduationCap,
+    Award,
+    ShieldCheck,
+    CheckCircle2,
+    Clock,
+    Briefcase,
+    Send,
+    User,
+    Mail,
+    Phone,
+    BookOpen
+} from 'lucide-react';
 
 export default function Internship() {
     const [status, setStatus] = useState('');
     const [duration, setDuration] = useState('');
     const [selectedDomain, setSelectedDomain] = useState('');
     const [customDomain, setCustomDomain] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const fileInputRef = useRef(null);
-
-    const fadeInUp = {
-        hidden: { opacity: 0, y: 40 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
-    };
-
-    const staggerContainer = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.2
-            }
-        }
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setStatus('Submitting...');
+        setIsSubmitting(true);
+        setStatus('Submitting your application...');
 
         const formData = new FormData(e.target);
         const finalDomain = selectedDomain === 'custom' ? customDomain.trim() : formData.get('skills');
 
         if (!finalDomain) {
             setStatus('Please enter your custom course/domain.');
+            setIsSubmitting(false);
             return;
         }
 
@@ -48,7 +50,6 @@ export default function Internship() {
             duration: formData.get('duration'),
         };
 
-        // Simulating API Call since we'll write the API route next
         try {
             const res = await fetch('/api/apply', {
                 method: 'POST',
@@ -57,247 +58,288 @@ export default function Internship() {
             });
 
             if (res.ok) {
-                setStatus('Application submitted successfully! We will contact you soon.');
+                setStatus('Application submitted successfully! Our team will contact you soon.');
                 e.target.reset();
                 setSelectedDomain('');
                 setCustomDomain('');
-                if (fileInputRef.current) fileInputRef.current.value = '';
             } else {
                 let errorMessage = 'Failed to submit application. Please try again.';
                 try {
                     const payload = await res.json();
-                    if (payload?.message) {
-                        errorMessage = payload.message;
-                    }
+                    if (payload?.message) errorMessage = payload.message;
                 } catch {
-                    // Keep fallback error message when response is not JSON.
+                    // fallback
                 }
-
                 setStatus(errorMessage);
             }
         } catch (error) {
             console.error(error);
             setStatus('An error occurred. Please try again later.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     return (
-        <main className="main-content">
-            <section style={{ padding: '6rem 2rem 4rem', textAlign: 'center' }}>
-                <motion.h1
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-gradient"
-                    style={{ fontSize: '3.5rem', marginBottom: '1rem' }}
-                >
-                    Internship Application
-                </motion.h1>
-                <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    style={{ color: 'var(--text-muted)', fontSize: '1.2rem', maxWidth: '700px', margin: '0 auto' }}
-                >
-                    Kickstart your career with MJ Tech Global. Learn from industry experts and work on live projects.
-                </motion.p>
-            </section>
-
-            <section style={{ padding: '2rem 2rem 8rem', maxWidth: '800px', margin: '0 auto' }}>
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.3 }}
-                >
-                    <form className="glass-card" onSubmit={handleSubmit} style={{ padding: '3rem', borderRadius: '20px', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}>
-                        <h2 style={{ marginBottom: '2rem', fontSize: '1.8rem', textAlign: 'center' }}>Student Details</h2>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Full Name *</label>
-                                <input type="text" name="name" required style={{ width: '100%', padding: '1rem', background: 'var(--primary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'white', fontSize: '1rem' }} />
-                            </div>
-
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Father's Name *</label>
-                                <input type="text" name="father_name" required style={{ width: '100%', padding: '1rem', background: 'var(--primary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'white', fontSize: '1rem' }} />
-                            </div>
-                        </div>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Email Address *</label>
-                                <input type="email" name="email" required style={{ width: '100%', padding: '1rem', background: 'var(--primary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'white', fontSize: '1rem' }} />
-                            </div>
-                        </div>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Gender *</label>
-                                <select name="gender" required defaultValue="" style={{ width: '100%', padding: '1rem', background: 'var(--primary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'white', fontSize: '1rem', appearance: 'auto' }}>
-                                    <option value="" disabled>Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Phone Number (eg. WhatsApp) *</label>
-                                <input type="tel" name="phone" required placeholder="eg. WhatsApp" style={{ width: '100%', padding: '1rem', background: 'var(--primary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'white', fontSize: '1rem' }} />
-                            </div>
-                        </div>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>College / University *</label>
-                                <input type="text" name="college" required style={{ width: '100%', padding: '1rem', background: 'var(--primary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'white', fontSize: '1rem' }} />
-                            </div>
-
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Technology / Domain *</label>
-                                <select
-                                    name="skills"
-                                    required
-                                    value={selectedDomain}
-                                    onChange={(e) => setSelectedDomain(e.target.value)}
-                                    style={{ width: '100%', padding: '1rem', background: 'var(--primary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'white', fontSize: '1rem', appearance: 'auto' }}
-                                >
-                                    <option value="" disabled>Select Domain</option>
-                                    <option value="Frontend Developer">Frontend Developer</option>
-                                    <option value="Backend Developer">Backend Developer</option>
-                                    <option value="React.js Developer">React.js Developer</option>
-                                    <option value="MERN Stack Developer">MERN Stack Developer</option>
-                                    <option value="Android Developer">Android Developer</option>
-                                    <option value="Flutter Developer">Flutter Developer</option>
-                                    <option value="App Developer">App Developer</option>
-                                    <option value="Python Developer">Python Developer</option>
-                                    <option value="Java Developer">Java Developer</option>
-                                    <option value="C++/C Programming">C++/C Programming</option>
-                                    <option value="Data Science">Data Science</option>
-                                    <option value="Machine Learning">Machine Learning</option>
-      
-      
-                                    <option value="Artificial Intelligence">Artificial Intelligence</option>
-                                    <option value="Business Analytics">Business Analytics</option>
-                                    <option value="Full Stack Web Development">Full Stack Web Development</option>
-                                    <option value="UI/UX Design">UI/UX Design</option>
-                                    <option value="Digital Marketing">Digital Marketing</option>
-                                    <option value="Cloud Computing">Cloud Computing</option>
-                                    <option value="Unity Game Developer">Unity Game Developer</option>
-                                    <option value="custom">Custom Course (Type Manually)</option>
-                                </select>
-                                {selectedDomain === 'custom' && (
-                                    <input
-                                        type="text"
-                                        name="custom_skills"
-                                        required
-                                        value={customDomain}
-                                        onChange={(e) => setCustomDomain(e.target.value)}
-                                        placeholder="Type your course/domain"
-                                        style={{ width: '100%', marginTop: '0.75rem', padding: '1rem', background: 'var(--primary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'white', fontSize: '1rem' }}
-                                    />
-                                )}
-                            </div>
-                        </div>
-
-                        <div style={{ marginBottom: '1.5rem' }}>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Internship Duration *</label>
-                            <select
-                                name="duration"
-                                required
-                                defaultValue=""
-                                onChange={(e) => setDuration(e.target.value)}
-                                style={{ width: '100%', padding: '1rem', background: 'var(--primary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: 'white', fontSize: '1rem', appearance: 'auto' }}
-                            >
-                                <option value="" disabled>Select Duration</option>
-                                <option value="1 Month">1 Month</option>
-                                <option value="45 Days">45 Days</option>
-                                <option value="3 Months">3 Months</option>
-                                <option value="4 Months">4 Months</option>
-                                <option value="6 Months">6 Months</option>
-                            </select>
-                        </div>
-
-
-
-                        <button type="submit" className="btn-primary-large" style={{ width: '100%', cursor: 'pointer', border: 'none' }}>
-                            Submit Application
-                        </button>
-                        {status && (
-                            <p style={{ marginTop: '1.5rem', textAlign: 'center', color: status.includes('success') ? '#27c93f' : (status.includes('error') || status.includes('Failed') ? '#ff5f56' : 'var(--accent)') }}>
-                                {status}
-                            </p>
-                        )}
-                        <p style={{ marginTop: '1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                            For queries, contact <a href="mailto:mjtechglobal@zohomail.in" style={{ color: 'var(--accent)' }}>mjtechglobal@zohomail.in</a> or <a href="mailto:mjtechbharat@gmail.com" style={{ color: 'var(--accent)' }}>mjtechbharat@gmail.com</a>
-                        </p>
-                    </form>
-                </motion.div>
-            </section>
-
-            {/* Internship Program Highlights */}
-            <section className="internship-highlight-section" style={{ padding: '2rem 2rem 8rem', background: 'var(--primary)', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: '-10%', right: '-10%', width: '400px', height: '400px', background: 'radial-gradient(circle, var(--accent) 0%, transparent 70%)', opacity: '0.05', borderRadius: '50%' }}></div>
-
-                <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-                    <motion.div
-                        className="section-header"
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true, margin: "-100px" }}
-                        variants={fadeInUp}
-                        style={{ textAlign: 'center', marginBottom: '4rem' }}
-                    >
-                        <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Launch Your Career with Our <span className="text-gradient">Internship Program</span></h2>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', maxWidth: '800px', margin: '0 auto' }}>
-                            Experience <strong>online free and paid internships</strong> designed to improve resumes, portfolios, and practical understanding for job readiness.
-                            Engage in project-based learning with real tasks and real tools.
-                        </p>
-                    </motion.div>
-
-                    <motion.div
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true, margin: "-50px" }}
-                        variants={staggerContainer}
-                        style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}
-                    >
-                        <motion.div className="glass-card" variants={fadeInUp} style={{ padding: '2rem', borderRadius: '16px', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}>
-                            <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🎓</div>
-                            <h3 style={{ fontSize: '1.4rem', marginBottom: '0.8rem' }}>Completion Certificate & LOR</h3>
-                            <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>Earn recognized verified certificates and a Letter of Recommendation upon successful completion to power up your resume.</p>
-                        </motion.div>
-
-                        <motion.div className="glass-card" variants={fadeInUp} style={{ padding: '2rem', borderRadius: '16px', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}>
-                            <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🛡️</div>
-                            <h3 style={{ fontSize: '1.4rem', marginBottom: '0.8rem' }}>Unique Verification IDs</h3>
-                            <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>Every internship certificate includes a unique verification ID, allowing employers to instantly authenticate your achievements.</p>
-                        </motion.div>
-
-                        <motion.div className="glass-card" variants={fadeInUp} style={{ padding: '2rem', borderRadius: '16px', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}>
-                            <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🛠️</div>
-                            <h3 style={{ fontSize: '1.4rem', marginBottom: '0.8rem' }}>Real Tasks & Real Tools</h3>
-                            <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>Work on real-world projects across multiple IT and tech careers utilizing industry-standard tools and practices.</p>
-                        </motion.div>
-
-                        <motion.div className="glass-card" variants={fadeInUp} style={{ padding: '2rem', borderRadius: '16px', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}>
-                            <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🚀</div>
-                            <h3 style={{ fontSize: '1.4rem', marginBottom: '0.8rem' }}>Career-Focused Learning</h3>
-                            <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>Practical understanding built for job readiness. Build a portfolio that stands out to recruiters globally.</p>
-                        </motion.div>
-                    </motion.div>
+        <main style={{ paddingTop: '80px', minHeight: '100vh', background: 'var(--light-bg)' }}>
+            {/* Header */}
+            <section style={{ padding: '5rem 1.5rem 3.5rem', textAlign: 'center' }}>
+                <div className="container" style={{ maxWidth: '850px' }}>
+                    <span className="badge badge-primary" style={{ marginBottom: '1rem' }}>
+                        <GraduationCap size={14} /> Career Development
+                    </span>
+                    <h1 style={{ fontSize: '3.25rem', fontWeight: 800, marginBottom: '1.25rem', letterSpacing: '-0.03em' }}>
+                        Internship <span className="text-gradient">Application</span>
+                    </h1>
+                    <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', lineHeight: 1.65 }}>
+                        Join the MJ Tech Global internship program. Learn practical development workflows, work on real projects, and earn verified credentials.
+                    </p>
                 </div>
             </section>
 
-            {/* Inject Media query for mobile */}
+            {/* Application Form */}
+            <section style={{ padding: '0 1.5rem 5rem' }}>
+                <div className="container" style={{ maxWidth: '850px' }}>
+                    <div className="card-light" style={{ padding: '3.5rem', borderRadius: '24px' }}>
+                        <h2 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '2rem', textAlign: 'center' }}>
+                            Student &amp; Applicant Details
+                        </h2>
+
+                        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-main)' }}>
+                                        Full Name *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        required
+                                        placeholder="e.g. Rahul Sharma"
+                                        style={{ width: '100%', padding: '0.85rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', outline: 'none', background: '#FFFFFF', fontSize: '0.95rem' }}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-main)' }}>
+                                        Father's Name *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="father_name"
+                                        required
+                                        placeholder="e.g. Ramesh Sharma"
+                                        style={{ width: '100%', padding: '0.85rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', outline: 'none', background: '#FFFFFF', fontSize: '0.95rem' }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-main)' }}>
+                                        Email Address *
+                                    </label>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        required
+                                        placeholder="name@example.com"
+                                        style={{ width: '100%', padding: '0.85rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', outline: 'none', background: '#FFFFFF', fontSize: '0.95rem' }}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-main)' }}>
+                                        WhatsApp / Phone Number *
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        required
+                                        placeholder="+91 9876543210"
+                                        style={{ width: '100%', padding: '0.85rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', outline: 'none', background: '#FFFFFF', fontSize: '0.95rem' }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-main)' }}>
+                                        Gender *
+                                    </label>
+                                    <select
+                                        name="gender"
+                                        required
+                                        defaultValue=""
+                                        style={{ width: '100%', padding: '0.85rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', outline: 'none', background: '#FFFFFF', fontSize: '0.95rem' }}
+                                    >
+                                        <option value="" disabled>Select Gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-main)' }}>
+                                        College / University *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="college"
+                                        required
+                                        placeholder="e.g. University Institute of Technology"
+                                        style={{ width: '100%', padding: '0.85rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', outline: 'none', background: '#FFFFFF', fontSize: '0.95rem' }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-main)' }}>
+                                        Technology / Domain *
+                                    </label>
+                                    <select
+                                        name="skills"
+                                        required
+                                        value={selectedDomain}
+                                        onChange={(e) => setSelectedDomain(e.target.value)}
+                                        style={{ width: '100%', padding: '0.85rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', outline: 'none', background: '#FFFFFF', fontSize: '0.95rem' }}
+                                    >
+                                        <option value="" disabled>Select Domain</option>
+                                        <option value="Frontend Developer">Frontend Developer</option>
+                                        <option value="Backend Developer">Backend Developer</option>
+                                        <option value="React.js Developer">React.js Developer</option>
+                                        <option value="MERN Stack Developer">MERN Stack Developer</option>
+                                        <option value="Android Developer">Android Developer</option>
+                                        <option value="Flutter Developer">Flutter Developer</option>
+                                        <option value="Full Stack Web Development">Full Stack Web Development</option>
+                                        <option value="Python Developer">Python Developer</option>
+                                        <option value="Artificial Intelligence">Artificial Intelligence</option>
+                                        <option value="UI/UX Design">UI/UX Design</option>
+                                        <option value="custom">Custom Course (Type Manually)</option>
+                                    </select>
+                                    {selectedDomain === 'custom' && (
+                                        <input
+                                            type="text"
+                                            name="custom_skills"
+                                            required
+                                            value={customDomain}
+                                            onChange={(e) => setCustomDomain(e.target.value)}
+                                            placeholder="Type your course / domain"
+                                            style={{ width: '100%', marginTop: '0.75rem', padding: '0.85rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', outline: 'none', background: '#FFFFFF', fontSize: '0.95rem' }}
+                                        />
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-main)' }}>
+                                        Internship Duration *
+                                    </label>
+                                    <select
+                                        name="duration"
+                                        required
+                                        defaultValue=""
+                                        onChange={(e) => setDuration(e.target.value)}
+                                        style={{ width: '100%', padding: '0.85rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', outline: 'none', background: '#FFFFFF', fontSize: '0.95rem' }}
+                                    >
+                                        <option value="" disabled>Select Duration</option>
+                                        <option value="1 Month">1 Month</option>
+                                        <option value="45 Days">45 Days</option>
+                                        <option value="3 Months">3 Months</option>
+                                        <option value="6 Months">6 Months</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="btn btn-primary"
+                                style={{ width: '100%', padding: '0.9rem', fontSize: '1rem', marginTop: '1rem' }}
+                            >
+                                {isSubmitting ? 'Submitting...' : 'Submit Internship Application'}
+                            </button>
+
+                            {status && (
+                                <p style={{
+                                    marginTop: '1rem',
+                                    textAlign: 'center',
+                                    fontWeight: 600,
+                                    color: status.includes('success') ? 'var(--success)' : (status.includes('Failed') || status.includes('error') ? '#EF4444' : 'var(--primary-blue)')
+                                }}>
+                                    {status}
+                                </p>
+                            )}
+
+                            <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.5rem' }}>
+                                Queries? Contact <a href={`mailto:${siteConfig.emails.support}`} style={{ color: 'var(--primary-blue)' }}>{siteConfig.emails.support}</a>
+                            </p>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            {/* Highlights */}
+            <section style={{ padding: '5rem 1.5rem', background: '#FFFFFF', borderTop: '1px solid var(--border-color)' }}>
+                <div className="container" style={{ maxWidth: '1100px' }}>
+                    <div style={{ textAlign: 'center', maxWidth: '700px', margin: '0 auto 3.5rem' }}>
+                        <span className="badge badge-primary">Program Benefits</span>
+                        <h2 style={{ fontSize: '2.25rem', fontWeight: 800, margin: '0.75rem 0' }}>Why Intern With MJ Tech Global</h2>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem' }}>
+                            Hands-on experience, real codebases, and digital verifiable credentials.
+                        </p>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
+                        <div className="card-light" style={{ padding: '2rem', textAlign: 'center' }}>
+                            <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>🎓</div>
+                            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '0.5rem' }}>Verified Certificate</h3>
+                            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+                                Every certificate carries a unique database verification ID searchable globally.
+                            </p>
+                        </div>
+
+                        <div className="card-light" style={{ padding: '2rem', textAlign: 'center' }}>
+                            <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>💻</div>
+                            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '0.5rem' }}>Live Project Work</h3>
+                            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+                                Gain practical exposure to modern frameworks, git collaboration, and clean architecture.
+                            </p>
+                        </div>
+
+                        <div className="card-light" style={{ padding: '2rem', textAlign: 'center' }}>
+                            <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>📄</div>
+                            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '0.5rem' }}>Portfolio Enhancement</h3>
+                            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+                                Build tangible case studies you can showcase on your resume and GitHub.
+                            </p>
+                        </div>
+
+                        <div className="card-light" style={{ padding: '2rem', textAlign: 'center' }}>
+                            <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⚡</div>
+                            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '0.5rem' }}>Flexible Durations</h3>
+                            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+                                Options from 1 month to 6 months designed to fit academic schedules.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Responsive */}
             <style jsx>{`
-        @media (max-width: 768px) {
-          form > div {
-            grid-template-columns: 1fr !important;
-            gap: 0 !important;
-          }
-        }
-      `}</style>
+                @media (max-width: 800px) {
+                    form > div {
+                        grid-template-columns: 1fr !important;
+                    }
+                    div[style*="gridTemplateColumns: repeat(4, 1fr)"] {
+                        grid-template-columns: 1fr 1fr !important;
+                    }
+                }
+                @media (max-width: 500px) {
+                    div[style*="gridTemplateColumns: repeat(4, 1fr)"] {
+                        grid-template-columns: 1fr !important;
+                    }
+                }
+            `}</style>
         </main>
     );
 }

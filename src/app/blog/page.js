@@ -2,66 +2,79 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { siteConfig } from '../../lib/siteConfig';
+import { BookOpen, Calendar, Clock, ArrowRight, Sparkles } from 'lucide-react';
 
-export default function Blog() {
-    const posts = [
-        { title: "Why Next.js is the Future of Enterprise Web Apps", date: "Oct 24, 2024", tag: "Engineering" },
-        { title: "Implementing Deep Learning in Healthcare", date: "Sep 15, 2024", tag: "AI/ML" },
-        { title: "Building Scalable Cloud Infrastructure on AWS", date: "Aug 02, 2024", tag: "DevOps" },
-        { title: "The Impact of Glassmorphism in Modern UI Design", date: "Jul 18, 2024", tag: "Design" }
-    ];
-
+export default function BlogPage() {
     return (
-        <main className="main-content">
-            <section style={{ padding: '6rem 2rem 4rem', textAlign: 'center' }}>
-                <motion.h1
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-gradient"
-                    style={{ fontSize: '3.5rem', marginBottom: '1rem' }}
-                >
-                    Tech Insights
-                </motion.h1>
-                <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    style={{ color: 'var(--text-muted)', fontSize: '1.2rem', maxWidth: '700px', margin: '0 auto' }}
-                >
-                    Latest news, architectural concepts, and engineering thoughts from our team.
-                </motion.p>
+        <main style={{ paddingTop: '80px', minHeight: '100vh', background: 'var(--light-bg)' }}>
+            {/* Header */}
+            <section style={{ padding: '5rem 1.5rem 3.5rem', textAlign: 'center' }}>
+                <div className="container" style={{ maxWidth: '850px' }}>
+                    <span className="badge badge-primary" style={{ marginBottom: '1rem' }}>
+                        <BookOpen size={14} /> Engineering Insights
+                    </span>
+                    <h1 style={{ fontSize: '3.25rem', fontWeight: 800, marginBottom: '1.25rem', letterSpacing: '-0.03em' }}>
+                        The MJ Tech Global <span className="text-gradient">Blog</span>
+                    </h1>
+                    <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', lineHeight: 1.65 }}>
+                        Architectural notes, automation insights, and engineering reflections from our product team.
+                    </p>
+                </div>
             </section>
 
-            <section style={{ padding: '2rem 2rem 8rem', maxWidth: '1000px', margin: '0 auto' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-                    {posts.map((post, idx) => (
-                        <motion.article
-                            key={idx}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: idx * 0.1 }}
-                            style={{
-                                padding: '2rem',
-                                background: 'var(--glass-bg)',
-                                border: '1px solid var(--glass-border)',
-                                borderRadius: '16px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'space-between',
-                                minHeight: '250px'
-                            }}
-                        >
-                            <div>
-                                <span style={{ color: 'var(--accent)', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>{post.tag}</span>
-                                <h3 style={{ fontSize: '1.5rem', margin: '1rem 0', lineHeight: '1.4' }}>{post.title}</h3>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem' }}>
-                                <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{post.date}</span>
-                                <Link href="#" style={{ color: 'var(--accent)', fontWeight: '600' }}>Read &rarr;</Link>
-                            </div>
-                        </motion.article>
-                    ))}
+            {/* Articles Grid */}
+            <section style={{ padding: '0 1.5rem 6rem' }}>
+                <div className="container" style={{ maxWidth: '1050px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2.5rem' }}>
+                        {siteConfig.blogPosts.map((post) => (
+                            <article
+                                key={post.slug}
+                                className="card-light"
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'space-between',
+                                    padding: '2.5rem',
+                                    borderRadius: '20px'
+                                }}
+                            >
+                                <div>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                        <span className="badge badge-primary">{post.category}</span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                            <Clock size={13} /> {post.readTime}
+                                        </div>
+                                    </div>
+
+                                    <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.75rem', lineHeight: 1.4 }}>
+                                        <Link href={`/blog/${post.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                                            {post.title}
+                                        </Link>
+                                    </h2>
+
+                                    <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '1.5rem' }}>
+                                        {post.summary}
+                                    </p>
+                                </div>
+
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    paddingTop: '1.25rem',
+                                    borderTop: '1px solid var(--border-color)',
+                                    fontSize: '0.85rem'
+                                }}>
+                                    <span style={{ color: 'var(--text-muted)' }}>{post.date}</span>
+                                    <Link href={`/blog/${post.slug}`} className="btn btn-secondary" style={{ padding: '0.45rem 0.85rem', fontSize: '0.82rem' }}>
+                                        <span>Read Article</span>
+                                        <ArrowRight size={14} />
+                                    </Link>
+                                </div>
+                            </article>
+                        ))}
+                    </div>
                 </div>
             </section>
         </main>
